@@ -1,26 +1,31 @@
+require("dotenv").config();
 const mongoose = require("mongoose");
 const Usuario = require("./models/Usuario");
 
-mongoose.connect("mongodb://127.0.0.1:27017/chatbotdb")
-  .then(() => console.log("📌 MongoDB conectado (seed)"))
-  .catch(err => console.log("❌ Error:", err));
+const uri = process.env.MONGODB_URI && process.env.MONGODB_URI.trim() !== ""
+  ? process.env.MONGODB_URI
+  : "mongodb://127.0.0.1:27017/chatbotdb";
 
-async function ejecutarSeed() {
+async function main() {
   try {
+    await mongoose.connect(uri);
+    console.log("MongoDB conectado");
+
     await Usuario.deleteMany();
 
     await Usuario.insertMany([
-      { nombre: "Samuel Puerto", email: "samuelpuero066@gmail.com" },
-      { nombre: "Jonathan Portuguez", email: "jonathan77@gmail.com" },
-      { nombre: "Daniel Mahecha", email: "mahecha709@gmail.com" }
+      { nombre: "Samuel Puerto", email: "samuelpuerto066@gmail.com" },
+      { nombre: "Jonathan Bernal", email: "jonathanbernal@gmail.com" },
+      { nombre: "Daniel Mahecha", email: "mahechadaniel@gmail.com" }
     ]);
 
-    console.log("🌱 Datos insertados correctamente");
+    console.log("Datos insertados correctamente");
   } catch (err) {
-    console.log("❌ Error en el seed:", err);
+    console.error("❌", err);
   } finally {
-    mongoose.connection.close();
+    await mongoose.disconnect();
+    process.exit(0);
   }
 }
 
-ejecutarSeed();
+main();
